@@ -2,50 +2,6 @@
   "version": "2.0.0",
   "tasks": [
     {
-      "label": "docker-compose-up-dev",
-      "type": "shell",
-      "command": "docker-compose",
-      "args": ["-f", "docker-compose.dev.yml", "up", "-d"],
-      "problemMatcher": [],
-      "presentation": {
-        "reveal": "always",
-        "panel": "new"
-      }
-    },
-    {
-      "label": "docker-compose-down-dev",
-      "type": "shell",
-      "command": "docker-compose",
-      "args": ["-f", "docker-compose.dev.yml", "down"],
-      "problemMatcher": []
-    },
-    {
-      "label": "docker-compose-build-dev",
-      "type": "shell",
-      "command": "docker-compose",
-      "args": ["-f", "docker-compose.dev.yml", "build", "--no-cache"],
-      "problemMatcher": []
-    },
-    {
-      "label": "docker-compose-logs",
-      "type": "shell",
-      "command": "docker-compose",
-      "args": ["-f", "docker-compose.dev.yml", "logs", "-f", "msf-dev"],
-      "problemMatcher": [],
-      "isBackground": true
-    },
-    {
-      "label": "docker-exec-bash",
-      "type": "shell",
-      "command": "docker-compose",
-      "args": ["-f", "docker-compose.dev.yml", "exec", "msf-dev", "bash"],
-      "problemMatcher": [],
-      "presentation": {
-        "reveal": "always",
-        "panel": "dedicated"
-      }
-    },
-    {
       "label": "docker-exec-msfconsole-debug",
       "type": "shell",
       "command": "docker-compose",
@@ -59,27 +15,6 @@
         "reveal": "always",
         "panel": "dedicated"
       }
-    },
-    {
-      "label": "docker-exec-msfconsole",
-      "type": "shell",
-      "command": "docker-compose",
-      "args": [
-        "-f", "docker-compose.dev.yml", "exec", "msf-dev",
-        "./msfconsole", "-r", "docker/msfconsole.rc", "-y", "/usr/src/metasploit-framework/config/database.yml"
-      ],
-      "problemMatcher": [],
-      "presentation": {
-        "reveal": "always",
-        "panel": "dedicated"
-      }
-    },
-    {
-      "label": "bundle-install",
-      "type": "shell",
-      "command": "docker-compose",
-      "args": ["-f", "docker-compose.dev.yml", "exec", "msf-dev", "bundle", "install"],
-      "problemMatcher": []
     }
   ]
 }
