@@ -174,11 +174,9 @@ metasploit-framework/
 ├── docker-compose.dev.yml      # 開発用compose設定
 ├── docker/
 │   └── entrypoint.dev.sh       # 開発用エントリポイント
-├── .vscode/
-│   ├── launch.json             # デバッグ設定
-│   └── tasks.json              # タスク定義
-└── .devcontainer/
-    └── devcontainer.json       # Dev Container設定
+└── .vscode/
+    ├── launch.json             # デバッグ設定
+    └── tasks.json              # タスク定義
 ```
 
 ## 公開ポート
