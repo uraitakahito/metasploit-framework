@@ -129,4 +129,5 @@ WORKDIR $APP_HOME
 
 ENTRYPOINT ["docker/entrypoint.dev.sh"]
 
-CMD ["./msfconsole", "-r", "docker/msfconsole.rc", "-y", "/usr/src/metasploit-framework/config/database.yml"]
+# Default: keep container running for manual msfconsole startup
+CMD ["sleep", "infinity"]

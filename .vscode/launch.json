@@ -34,13 +34,5 @@
       "useBundler": true,
       "cwd": "${workspaceFolder}"
     }
-  ],
-  "compounds": [
-    {
-      "name": "Docker + Attach",
-      "configurations": ["Attach: msfconsole (Docker)"],
-      "preLaunchTask": "docker-compose-up-dev",
-      "stopAll": true
-    }
   ]
 }

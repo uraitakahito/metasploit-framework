@@ -32,10 +32,21 @@ docker-compose -f docker-compose.dev.yml up -d
 docker-compose -f docker-compose.dev.yml ps
 ```
 
-rdbgサーバーが起動しているか確認:
+コンテナは待機状態で起動します（`sleep infinity`）。
+
+### 3. msfconsole を起動（デバッグあり）
+
+VS Code タスクを使用する方法:
+
+1. `Cmd+Shift+P` → `Tasks: Run Task`
+2. `docker-exec-msfconsole-debug` を選択
+
+または、コマンドラインから:
 
 ```bash
-docker-compose -f docker-compose.dev.yml logs msf-dev
+docker-compose -f docker-compose.dev.yml exec msf-dev \
+  rdbg --open --host 0.0.0.0 --port 38697 -c -- \
+  ./msfconsole -r docker/msfconsole.rc -y /usr/src/metasploit-framework/config/database.yml
 ```
 
 以下のメッセージが表示されれば成功です:
@@ -45,7 +56,7 @@ DEBUGGER: Debugger can attach via TCP/IP (0.0.0.0:38697)
 DEBUGGER: wait for debugger connection...
 ```
 
-### 3. VS Code でデバッグ開始
+### 4. VS Code でデバッガーをアタッチ
 
 1. VS Code でプロジェクトを開く
 2. 左サイドバーの「実行とデバッグ」アイコンをクリック（または `Cmd+Shift+D`）
@@ -85,7 +96,6 @@ binding.break  # ここで実行が停止します
 | `Launch: msfconsole (Local)` | ローカル環境で直接起動してデバッグ |
 | `Debug: Current Ruby File` | 現在開いているファイルをデバッグ |
 | `Debug: RSpec Current File` | RSpecテストをデバッグ |
-| `Docker + Attach` | コンテナ起動とアタッチを連続実行 |
 
 ## よく使うコマンド
 
@@ -118,11 +128,33 @@ UID=$(id -u) GID=$(id -g) docker-compose -f docker-compose.dev.yml build --no-ca
 
 `Cmd+Shift+P` → `Tasks: Run Task` から以下のタスクを実行できます:
 
-- `docker-compose-up-dev` - コンテナ起動
-- `docker-compose-down-dev` - コンテナ停止
-- `docker-compose-build-dev` - イメージ再ビルド
-- `docker-compose-logs` - ログ表示
-- `docker-exec-bash` - コンテナにシェル接続
+| タスク | 説明 |
+|-------|------|
+| `docker-compose-up-dev` | コンテナ起動 |
+| `docker-compose-down-dev` | コンテナ停止 |
+| `docker-compose-build-dev` | イメージ再ビルド |
+| `docker-compose-logs` | ログ表示 |
+| `docker-exec-bash` | コンテナにシェル接続 |
+| `docker-exec-msfconsole-debug` | msfconsole起動（デバッガ付き） |
+| `docker-exec-msfconsole` | msfconsole起動（デバッガなし） |
+| `bundle-install` | bundle install実行 |
+
+## 開発ワークフロー
+
+### デバッグあり
+
+```
+1. docker-compose -f docker-compose.dev.yml up -d
+2. VS Code タスク: docker-exec-msfconsole-debug
+3. VS Code デバッグ: Attach: msfconsole (Docker)
+```
+
+### デバッグなし
+
+```
+1. docker-compose -f docker-compose.dev.yml up -d
+2. VS Code タスク: docker-exec-msfconsole
+```
 
 ## トラブルシューティング
 
@@ -150,10 +182,7 @@ docker-compose -f docker-compose.dev.yml up -d
    docker-compose -f docker-compose.dev.yml ps
    ```
 
-2. rdbgサーバーが起動しているか確認:
-   ```bash
-   docker-compose -f docker-compose.dev.yml logs msf-dev | grep DEBUGGER
-   ```
+2. msfconsoleがデバッガ付きで起動しているか確認（ターミナルに`DEBUGGER: wait for debugger connection...`が表示されているか）
 
 3. ポート38697が開いているか確認:
    ```bash
@@ -164,6 +193,18 @@ docker-compose -f docker-compose.dev.yml up -d
 
 ```bash
 docker-compose -f docker-compose.dev.yml exec msf-dev bundle install
+```
+
+### データベース接続エラー
+
+```
+[-] Error while running command db_connect: We could not find your database: msf.
+```
+
+初回起動時はPostgreSQLデータベースが作成されていません。以下のコマンドでデータベースを作成してください:
+
+```bash
+docker-compose -f docker-compose.dev.yml exec msf-dev bin/rails db:create
 ```
 
 ## ファイル構成
