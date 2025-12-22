@@ -1,0 +1,37 @@
+{
+  "name": "Metasploit Framework Dev",
+  "dockerComposeFile": ["../docker-compose.dev.yml"],
+  "service": "msf-dev",
+  "workspaceFolder": "/usr/src/metasploit-framework",
+  "overrideCommand": true,
+
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "Shopify.ruby-lsp",
+        "KoichiSasada.vscode-rdbg",
+        "misogi.ruby-rubocop"
+      ],
+      "settings": {
+        "ruby.useBundler": true,
+        "ruby.useLanguageServer": true,
+        "[ruby]": {
+          "editor.defaultFormatter": "Shopify.ruby-lsp",
+          "editor.formatOnSave": true,
+          "editor.tabSize": 2
+        },
+        "debug.allowBreakpointsEverywhere": true
+      }
+    }
+  },
+
+  "forwardPorts": [4444, 38697],
+
+  "remoteUser": "root",
+
+  "postCreateCommand": "bundle install",
+
+  "features": {
+    "ghcr.io/devcontainers/features/git:1": {}
+  }
+}

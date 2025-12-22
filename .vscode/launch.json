@@ -1,0 +1,46 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "rdbg",
+      "name": "Attach: msfconsole (Docker)",
+      "request": "attach",
+      "debugPort": "localhost:38697",
+      "localfsMap": "/usr/src/metasploit-framework:${workspaceFolder}"
+    },
+    {
+      "type": "rdbg",
+      "name": "Launch: msfconsole (Local)",
+      "request": "launch",
+      "script": "${workspaceFolder}/msfconsole",
+      "args": [],
+      "useBundler": true,
+      "cwd": "${workspaceFolder}"
+    },
+    {
+      "type": "rdbg",
+      "name": "Debug: Current Ruby File",
+      "request": "launch",
+      "script": "${file}",
+      "useBundler": true,
+      "cwd": "${workspaceFolder}"
+    },
+    {
+      "type": "rdbg",
+      "name": "Debug: RSpec Current File",
+      "request": "launch",
+      "command": "rspec",
+      "script": "${file}",
+      "useBundler": true,
+      "cwd": "${workspaceFolder}"
+    }
+  ],
+  "compounds": [
+    {
+      "name": "Docker + Attach",
+      "configurations": ["Attach: msfconsole (Docker)"],
+      "preLaunchTask": "docker-compose-up-dev",
+      "stopAll": true
+    }
+  ]
+}
