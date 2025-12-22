@@ -15,8 +15,10 @@ VS Code + Docker を使用して msfconsole をステップ実行デバッグす
 初回のみ実行します（10〜15分程度かかります）:
 
 ```bash
-docker-compose -f docker-compose.dev.yml build
+UID=$(id -u) GID=$(id -g) docker-compose -f docker-compose.dev.yml build
 ```
+
+> **Note**: `UID`と`GID`を渡すことで、コンテナ内のユーザーIDがホストと一致し、ファイル権限の問題を回避できます。
 
 ### 2. コンテナを起動
 
@@ -103,8 +105,14 @@ docker-compose -f docker-compose.dev.yml logs -f msf-dev
 docker-compose -f docker-compose.dev.yml exec msf-dev bash
 
 # イメージを再ビルド（Gemfile変更時など）
-docker-compose -f docker-compose.dev.yml build --no-cache
+UID=$(id -u) GID=$(id -g) docker-compose -f docker-compose.dev.yml build --no-cache
 ```
+
+> **Tip**: 毎回`UID`/`GID`を指定するのが面倒な場合は、`.env`ファイルを作成してください:
+> ```bash
+> echo "UID=$(id -u)" >> .env
+> echo "GID=$(id -g)" >> .env
+> ```
 
 ### VS Code タスク
 

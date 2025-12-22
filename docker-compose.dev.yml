@@ -4,6 +4,9 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.dev
+      args:
+        user_id: ${UID:-1000}
+        group_id: ${GID:-1000}
     environment:
       DATABASE_URL: postgres://postgres@db:5432/msf?pool=200&timeout=5
       RAILS_ENV: development
@@ -36,6 +39,9 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.dev
+      args:
+        user_id: ${UID:-1000}
+        group_id: ${GID:-1000}
     environment:
       DATABASE_URL: postgres://postgres@db:5432/msf?pool=200&timeout=5
       RAILS_ENV: development

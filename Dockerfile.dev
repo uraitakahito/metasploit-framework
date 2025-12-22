@@ -54,14 +54,41 @@ RUN mkdir -p $TOOLS_HOME/bin && \
     cd go/src && \
     ./make.bash
 
+##########################################################################
+
 FROM ruby:3.3.8-alpine3.21
 LABEL maintainer="Rapid7"
 ARG TARGETARCH
+ARG user_name=developer
+ARG user_id
+ARG group_id
+ARG features_repository="https://github.com/uraitakahito/features.git"
 
 ENV APP_HOME=/usr/src/metasploit-framework
 ENV TOOLS_HOME=/usr/src/tools
 ENV NMAP_PRIVILEGED=""
 ENV METASPLOIT_GROUP=metasploit
+
+#
+# Git
+#
+RUN apk add --no-cache git
+
+#
+# clone features
+#
+RUN cd /usr/src && \
+  git clone --depth 1 ${features_repository}
+
+#
+# Add user and install common utils.
+#
+RUN USERNAME=${user_name} \
+    USERUID=${user_id} \
+    USERGID=${group_id} \
+    CONFIGUREZSHASDEFAULTSHELL=true \
+    UPGRADEPACKAGES=false \
+      /usr/src/features/src/common-utils/install.sh
 
 RUN addgroup -S $METASPLOIT_GROUP
 
@@ -77,10 +104,6 @@ RUN \
 RUN /usr/sbin/setcap cap_net_raw,cap_net_bind_service=+eip $(which ruby)
 RUN /usr/sbin/setcap cap_net_raw,cap_net_bind_service=+eip $(which nmap)
 
-# Install Claude Code
-RUN curl -fsSL https://claude.ai/install.sh | bash
-ENV PATH="/root/.local/bin:${PATH}"
-
 COPY --from=builder /usr/local/bundle /usr/local/bundle
 RUN chown -R root:metasploit /usr/local/bundle
 COPY . $APP_HOME/
@@ -93,6 +116,11 @@ RUN cp -f $APP_HOME/docker/database.yml $APP_HOME/config/database.yml
 ENV GOPATH=$TOOLS_HOME/go
 ENV GOROOT=$TOOLS_HOME/bin/go
 ENV PATH=${PATH}:${GOPATH}/bin:${GOROOT}/bin
+
+USER ${user_name}
+
+# Install Claude Code
+RUN curl -fsSL https://claude.ai/install.sh | bash
 
 # Debug port for rdbg DAP
 EXPOSE 38697
