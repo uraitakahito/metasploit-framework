@@ -29,6 +29,8 @@ services:
       - ${HOME}/.msf4:/home/msf/.msf4
       # Bundle cache
       - bundle_cache:/usr/local/bundle
+      # Zsh history persistence
+      - zsh_history:/zsh-volume
     stdin_open: true
     tty: true
     # Keep container running, start msfconsole manually via docker exec
@@ -45,4 +47,6 @@ volumes:
   pg_data_dev:
     driver: local
   bundle_cache:
+    driver: local
+  zsh_history:
     driver: local
