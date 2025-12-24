@@ -44,9 +44,7 @@ VS Code タスクを使用する方法:
 または、コマンドラインから:
 
 ```bash
-docker-compose -f docker-compose.dev.yml exec msf-dev \
-  rdbg --open --host 0.0.0.0 --port 38697 -c -- \
-  ./msfconsole -r docker/msfconsole.rc -y /usr/src/metasploit-framework/config/database.yml
+docker-compose -f docker-compose.dev.yml exec msf-dev rdbg --open --host 0.0.0.0 --port 38697 -c -- ./msfconsole -r docker/msfconsole.rc -y /usr/src/metasploit-framework/config/database.yml
 ```
 
 以下のメッセージが表示されれば成功です:
