@@ -105,7 +105,7 @@ binding.break  # ここで実行が停止します
 # コンテナを起動
 docker-compose -f docker-compose.dev.yml up -d
 
-# コンテナを停止
+# コンテナを停止（データは保持）
 docker-compose -f docker-compose.dev.yml down
 
 # ログを確認
@@ -118,11 +118,18 @@ docker-compose -f docker-compose.dev.yml exec msf-dev bash
 UID=$(id -u) GID=$(id -g) docker-compose -f docker-compose.dev.yml build --no-cache
 ```
 
-> **Tip**: 毎回`UID`/`GID`を指定するのが面倒な場合は、`.env`ファイルを作成してください:
-> ```bash
-> echo "UID=$(id -u)" >> .env
-> echo "GID=$(id -g)" >> .env
-> ```
+#### stop / down / down -v の違い
+
+| コマンド | コンテナ | Volume（データ） | 用途 |
+|----------|----------|------------------|------|
+| `stop` | 停止のみ | 残る | 一時的な停止、すぐ再開する場合 |
+| `down` | 削除 | **残る** | 通常の停止（推奨） |
+| `down -v` | 削除 | **削除** | クリーンな状態に戻したい場合 |
+
+```bash
+# 一時停止（コンテナは残る）
+docker-compose -f docker-compose.dev.yml stop
+```
 
 ### VS Code タスク
 
@@ -205,21 +212,6 @@ docker-compose -f docker-compose.dev.yml exec msf-dev bundle install
 
 ```bash
 docker-compose -f docker-compose.dev.yml exec msf-dev bin/rails db:create
-```
-
-## ファイル構成
-
-```
-metasploit-framework/
-├── Dockerfile.dev              # 開発用Dockerfile
-├── docker-compose.dev.yml      # 開発用compose設定
-├── docker/
-│   └── entrypoint.dev.sh       # 開発用エントリポイント
-└── .vscode/
-    ├── launch.json             # デバッグ設定
-    ├── tasks.json              # タスク定義
-    ├── settings.json           # エディタ設定（Solargraph等）
-    └── extensions.json         # 推奨拡張機能
 ```
 
 ## 公開ポート

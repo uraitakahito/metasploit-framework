@@ -43,7 +43,7 @@ RUN apk add --no-cache \
          bundle clean --force; \
        fi \
     && rm -rf /usr/local/bundle/cache \
-    && chmod -R a+r /usr/local/bundle
+    && chmod -R a+rX /usr/local/bundle
 
 ENV GO111MODULE=off
 RUN mkdir -p $TOOLS_HOME/bin && \
@@ -92,6 +92,9 @@ RUN USERNAME=${user_name} \
 
 RUN addgroup -S $METASPLOIT_GROUP
 
+# Add developer user to metasploit group for gem write access
+RUN adduser ${user_name} ${METASPLOIT_GROUP}
+
 RUN apk add --no-cache curl bash sqlite-libs nmap nmap-scripts nmap-nselibs \
     postgresql-libs python3 py3-pip py3-impacket py3-requests ncurses libcap su-exec alpine-sdk \
     openssl-dev nasm nodejs npm
@@ -105,11 +108,14 @@ RUN /usr/sbin/setcap cap_net_raw,cap_net_bind_service=+eip $(which ruby)
 RUN /usr/sbin/setcap cap_net_raw,cap_net_bind_service=+eip $(which nmap)
 
 COPY --from=builder /usr/local/bundle /usr/local/bundle
-RUN chown -R root:metasploit /usr/local/bundle
+RUN chown -R root:metasploit /usr/local/bundle && \
+    chmod -R g+w /usr/local/bundle && \
+    find /usr/local/bundle -type d -exec chmod g+s {} \;
 COPY . $APP_HOME/
 COPY --from=builder $TOOLS_HOME $TOOLS_HOME
-RUN chown -R root:metasploit $APP_HOME/
-RUN chmod 664 $APP_HOME/Gemfile.lock
+RUN chown -R root:metasploit $APP_HOME/ && \
+    chmod -R g+w $APP_HOME/ && \
+    find $APP_HOME -type d -exec chmod g+s {} \;
 RUN gem update --system
 RUN cp -f $APP_HOME/docker/database.yml $APP_HOME/config/database.yml
 
