@@ -16,7 +16,7 @@
       "label": "msfconsole (debug)",
       "type": "shell",
       "command": "rdbg",
-      "args": ["-O", "-c", "--", "./msfconsole", "-y", "${workspaceFolder}/config/database.yml"],
+      "args": ["-O", "--port=38697", "-c", "--", "./msfconsole", "-y", "${workspaceFolder}/config/database.yml"],
       "problemMatcher": [],
       "presentation": {
         "reveal": "always",

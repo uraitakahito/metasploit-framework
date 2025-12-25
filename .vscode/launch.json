@@ -4,7 +4,8 @@
     {
       "type": "rdbg",
       "name": "Attach: msfconsole",
-      "request": "attach"
+      "request": "attach",
+      "debugPort": "localhost:38697"
     },
     {
       "type": "rdbg",
