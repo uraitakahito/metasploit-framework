@@ -25,6 +25,8 @@ group :development do
   gem 'memory_profiler'
   # cpu profiling
   gem 'ruby-prof'
+  # Ruby language server for IDE support
+  gem 'solargraph'
   # Metasploit::Aggregator external session proxy
   # disabled during 2.5 transition until aggregator is available
   # gem 'metasploit-aggregator'

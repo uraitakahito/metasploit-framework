@@ -6,7 +6,9 @@ VS Code + Docker を使用して msfconsole をステップ実行デバッグす
 
 - Docker Desktop がインストールされていること
 - VS Code がインストールされていること
-- VS Code 拡張機能 `KoichiSasada.vscode-rdbg` がインストールされていること
+- VS Code 拡張機能:
+  - `KoichiSasada.vscode-rdbg` - Rubyデバッガー
+  - `castwide.solargraph` - Ruby Language Server（コード補完・定義ジャンプ）
 
 ## セットアップ手順
 
@@ -215,7 +217,9 @@ metasploit-framework/
 │   └── entrypoint.dev.sh       # 開発用エントリポイント
 └── .vscode/
     ├── launch.json             # デバッグ設定
-    └── tasks.json              # タスク定義
+    ├── tasks.json              # タスク定義
+    ├── settings.json           # エディタ設定（Solargraph等）
+    └── extensions.json         # 推奨拡張機能
 ```
 
 ## 公開ポート
@@ -224,3 +228,21 @@ metasploit-framework/
 |-------|------|
 | 4444 | リバースシェル用リスナー |
 | 38697 | rdbg デバッガー接続用 |
+| 7658 | Solargraph Language Server |
+
+## Solargraph（コード補完・定義ジャンプ）
+
+Solargraphを使用するには、コンテナ内でサーバーを起動する必要があります。
+
+### Solargraphサーバーの起動
+
+```bash
+docker-compose -f docker-compose.dev.yml exec msf-dev bundle exec solargraph socket --host 0.0.0.0 --port 7658
+```
+
+サーバー起動後、VS Codeは自動的に`localhost:7658`に接続し、以下の機能が利用可能になります：
+
+- コード補完
+- 定義へのジャンプ（`Cmd+Click` または `F12`）
+- ホバー時のドキュメント表示
+- シンボル検索（`Cmd+Shift+O`）

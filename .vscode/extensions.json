@@ -43,11 +43,11 @@
     //
     // Ruby
     //
+    // https://marketplace.visualstudio.com/items?itemName=castwide.solargraph
+    "castwide.solargraph",
     // https://marketplace.visualstudio.com/items?itemName=kaiwood.endwise
     "kaiwood.endwise",
     // https://marketplace.visualstudio.com/items?itemName=KoichiSasada.vscode-rdbg
-    "KoichiSasada.vscode-rdbg",
-    // https://marketplace.visualstudio.com/items?itemName=Shopify.ruby-lsp
-    "Shopify.ruby-lsp",
+    "KoichiSasada.vscode-rdbg"
   ]
 }

@@ -22,6 +22,8 @@ services:
       - "4444:4444"
       # Debug port for rdbg DAP
       - "38697:38697"
+      # Solargraph language server
+      - "7658:7658"
     volumes:
       # Mount source code for hot reload
       - .:/usr/src/metasploit-framework
