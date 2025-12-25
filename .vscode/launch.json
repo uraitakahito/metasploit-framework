@@ -5,7 +5,8 @@
       "type": "rdbg",
       "name": "Attach: msfconsole",
       "request": "attach",
-      "debugPort": "localhost:38697"
+      "debugPort": "localhost:38697",
+      "localfs": true
     },
     {
       "type": "rdbg",
