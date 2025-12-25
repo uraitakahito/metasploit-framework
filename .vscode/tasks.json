@@ -13,6 +13,18 @@
       }
     },
     {
+      "label": "msfconsole (debug)",
+      "type": "shell",
+      "command": "rdbg",
+      "args": ["-O", "-c", "--", "./msfconsole", "-y", "${workspaceFolder}/config/database.yml"],
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated"
+      },
+      "isBackground": true
+    },
+    {
       "label": "msfconsole (with resource)",
       "type": "shell",
       "command": "./msfconsole",

@@ -3,11 +3,8 @@
   "configurations": [
     {
       "type": "rdbg",
-      "name": "Debug: msfconsole",
-      "request": "launch",
-      "script": "${workspaceFolder}/msfconsole",
-      "args": ["-y", "${workspaceFolder}/config/database.yml"],
-      "cwd": "${workspaceFolder}"
+      "name": "Attach: msfconsole",
+      "request": "attach"
     },
     {
       "type": "rdbg",

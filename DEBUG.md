@@ -36,7 +36,14 @@ docker-compose -f docker-compose.dev.yml up -d
 ### 4. デバッグ開始
 
 1. デバッグしたいファイルにブレークポイントを設定
-2. `F5` → `Debug: msfconsole` を選択
+2. `Cmd+Shift+P` → `Tasks: Run Task` → `msfconsole (debug)` を実行
+3. ターミナルに `DEBUGGER: Debugger can attach via UNIX domain socket...` が表示されたら準備完了
+4. `F5` → `Attach: msfconsole` を選択
+
+| 場所 | 操作 |
+|------|------|
+| Terminal | msfconsole コマンド入力 |
+| Debug Console | デバッガー操作（変数確認等） |
 
 ## タスク
 
@@ -45,6 +52,7 @@ docker-compose -f docker-compose.dev.yml up -d
 | タスク | 説明 |
 |-------|------|
 | `msfconsole` | msfconsole を起動 |
+| `msfconsole (debug)` | デバッガー付きで起動（その後 `F5` でアタッチ） |
 | `msfconsole (with resource)` | リソースファイル指定で起動 |
 | `rspec` | 現在のファイルのテストを実行 |
 
