@@ -63,6 +63,7 @@ ARG user_name=developer
 ARG user_id
 ARG group_id
 ARG features_repository="https://github.com/uraitakahito/features.git"
+ARG dotfiles_repository="https://github.com/uraitakahito/dotfiles.git"
 
 ENV APP_HOME=/usr/src/metasploit-framework
 ENV TOOLS_HOME=/usr/src/tools
@@ -124,6 +125,13 @@ ENV GOROOT=$TOOLS_HOME/bin/go
 ENV PATH=${PATH}:${GOPATH}/bin:${GOROOT}/bin
 
 USER ${user_name}
+
+#
+# dotfiles
+#
+RUN cd /home/${user_name} && \
+  git clone --depth 1 ${dotfiles_repository} && \
+  dotfiles/install.sh
 
 # Install Claude Code
 RUN curl -fsSL https://claude.ai/install.sh | bash
