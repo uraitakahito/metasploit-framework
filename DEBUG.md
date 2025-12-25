@@ -37,7 +37,7 @@ docker-compose -f docker-compose.dev.yml up -d
 
 1. デバッグしたいファイルにブレークポイントを設定
 2. `Cmd+Shift+P` → `Tasks: Run Task` → `msfconsole (debug)` を実行
-3. ターミナルに `DEBUGGER: Debugger can attach via UNIX domain socket...` が表示されたら準備完了
+3. ターミナルに `DEBUGGER: Debugger can attach via TCP/IP (127.0.0.1:38697)` が表示されたら準備完了
 4. `F5` → `Attach: msfconsole` を選択
 
 | 場所 | 操作 |
