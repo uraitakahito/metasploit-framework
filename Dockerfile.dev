@@ -128,9 +128,6 @@ USER ${user_name}
 # Install Claude Code
 RUN curl -fsSL https://claude.ai/install.sh | bash
 
-# Debug port for rdbg DAP
-EXPOSE 38697
-
 WORKDIR $APP_HOME
 
 ENTRYPOINT ["docker/entrypoint.dev.sh"]
