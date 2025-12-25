@@ -11,7 +11,8 @@ exclude:
 - db/**/*
 - external/**/*
 - plugins/**/*
-- scripts/**/* # Some of this is old and may not need indexing???
+- scripts/**/*
+- tools/**/*
 require: []
 domains: []
 reporters:

@@ -1,4 +1,4 @@
-# -*- coding: binary -*-
+# encoding: utf-8
 
 
 module Msf

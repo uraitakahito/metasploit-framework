@@ -1,4 +1,4 @@
-# -*- coding: binary -*-
+# encoding: utf-8
 
 #
 # This mixin is a simplistic implementation of X11 extensions protocol

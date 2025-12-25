@@ -1,4 +1,4 @@
-# -*- coding: binary -*-
+# encoding: utf-8
 
 module Msf
   module Payload::Windows::ReflectivePELoader_x64
