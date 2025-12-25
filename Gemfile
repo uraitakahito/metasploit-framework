@@ -26,7 +26,7 @@ group :development do
   # cpu profiling
   gem 'ruby-prof'
   # Ruby language server for IDE support
-  gem 'solargraph'
+  gem 'solargraph', '~> 0.57.0'
   # Metasploit::Aggregator external session proxy
   # disabled during 2.5 transition until aggregator is available
   # gem 'metasploit-aggregator'
@@ -42,7 +42,7 @@ group :development, :test do
   gem 'rspec-rails'
   gem 'rspec-rerun'
   # Required during CI as well local development
-  gem 'rubocop', '1.75.7'
+  gem 'rubocop', '~> 1.76'
 end
 
 group :test do
