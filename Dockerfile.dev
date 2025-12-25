@@ -112,13 +112,10 @@ COPY --from=builder /usr/local/bundle /usr/local/bundle
 RUN chown -R root:metasploit /usr/local/bundle && \
     chmod -R g+w /usr/local/bundle && \
     find /usr/local/bundle -type d -exec chmod g+s {} \;
-COPY . $APP_HOME/
+# Note: Source code is mounted via docker-compose.dev.yml volume
+# Only copy tools (Go environment) which is not volume-mounted
 COPY --from=builder $TOOLS_HOME $TOOLS_HOME
-RUN chown -R root:metasploit $APP_HOME/ && \
-    chmod -R g+w $APP_HOME/ && \
-    find $APP_HOME -type d -exec chmod g+s {} \;
 RUN gem update --system
-RUN cp -f $APP_HOME/docker/database.yml $APP_HOME/config/database.yml
 
 ENV GOPATH=$TOOLS_HOME/go
 ENV GOROOT=$TOOLS_HOME/bin/go
@@ -139,6 +136,4 @@ RUN curl -fsSL https://claude.ai/install.sh | bash
 WORKDIR $APP_HOME
 
 ENTRYPOINT ["docker/entrypoint.dev.sh"]
-
-# Default: keep container running for manual msfconsole startup
-CMD ["sleep", "infinity"]
+# Note: CMD is specified in docker-compose.dev.yml

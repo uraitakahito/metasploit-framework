@@ -12,10 +12,14 @@ services:
         user_id: ${UID:-1000}
         group_id: ${GID:-1000}
     environment:
-      DATABASE_URL: postgres://postgres@db:5432/msf?pool=200&timeout=5
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_NAME: msf
+      DB_USER: postgres
       RAILS_ENV: development
     depends_on:
-      - db
+      db:
+        condition: service_healthy
     ports:
       # Reverse shell listener
       - "4444:4444"
@@ -34,16 +38,18 @@ services:
     command: sleep infinity
 
   db:
-    image: postgres:10-alpine
+    image: postgres:16-alpine
     volumes:
       - pg_data_dev:/var/lib/postgresql/data
     environment:
       POSTGRES_HOST_AUTH_METHOD: trust
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 2s
+      timeout: 5s
+      retries: 10
 
 volumes:
   pg_data_dev:
-    driver: local
   bundle_cache:
-    driver: local
   zsh_history:
-    driver: local

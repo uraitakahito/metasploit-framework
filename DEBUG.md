@@ -84,12 +84,11 @@ UID=$(id -u) GID=$(id -g) docker-compose -f docker-compose.dev.yml build --no-ca
 
 ### データベース接続エラー
 
-```
-[-] Error while running command db_connect: We could not find your database: msf.
-```
+通常、コンテナ起動時に `config/database.yml` とデータベースが自動で作成されます。
 
-コンテナ内で以下を実行:
+手動で作成する場合:
 
 ```bash
-bin/rails db:create
+rails db:create
 ```
+
