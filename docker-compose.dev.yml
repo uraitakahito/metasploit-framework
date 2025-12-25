@@ -1,8 +1,8 @@
 # docker-compose.dev.yml - Development/Debug environment
 # Usage:
 #   1. Start containers: docker-compose -f docker-compose.dev.yml up -d
-#   2. Run msfconsole with debugger: Use VS Code task "docker-exec-msfconsole-debug"
-#   3. Attach VS Code debugger: "Attach: msfconsole (Docker)"
+#   2. VS Code: "Dev Containers: Attach to Running Container..." → msf-dev
+#   3. Open /usr/src/metasploit-framework and start debugging with F5
 services:
   msf-dev:
     build:
@@ -19,10 +19,6 @@ services:
     ports:
       # Reverse shell listener
       - "4444:4444"
-      # Debug port for rdbg DAP
-      - "38697:38697"
-      # Solargraph language server
-      - "7658:7658"
     volumes:
       # Mount source code for hot reload
       - .:/usr/src/metasploit-framework

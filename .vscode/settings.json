@@ -1,10 +1,4 @@
 {
-  "solargraph.commandPath": "/usr/local/bundle/bin/solargraph",
-  "solargraph.useBundler": true,
-  "solargraph.bundlerPath": "/usr/local/bin/bundle",
-  "solargraph.transport": "external",
-  "solargraph.externalServer": {
-    "host": "localhost",
-    "port": 7658
-  }
+  "solargraph.diagnostics": true,
+  "solargraph.formatting": true
 }

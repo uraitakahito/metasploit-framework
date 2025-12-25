@@ -2,19 +2,48 @@
   "version": "2.0.0",
   "tasks": [
     {
-      "label": "docker-exec-msfconsole-debug",
+      "label": "msfconsole",
       "type": "shell",
-      "command": "docker-compose",
+      "command": "./msfconsole",
+      "args": ["-y", "${workspaceFolder}/config/database.yml"],
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated"
+      }
+    },
+    {
+      "label": "msfconsole (with resource)",
+      "type": "shell",
+      "command": "./msfconsole",
       "args": [
-        "-f", "docker-compose.dev.yml", "exec", "msf-dev",
-        "rdbg", "--open", "--host", "0.0.0.0", "--port", "38697", "-c", "--",
-        "./msfconsole", "-r", "docker/msfconsole.rc", "-y", "/usr/src/metasploit-framework/config/database.yml"
+        "-y", "${workspaceFolder}/config/database.yml",
+        "-r", "${input:resourceFile}"
       ],
       "problemMatcher": [],
       "presentation": {
         "reveal": "always",
         "panel": "dedicated"
       }
+    },
+    {
+      "label": "rspec",
+      "type": "shell",
+      "command": "rspec",
+      "args": ["${file}"],
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated"
+      }
+    }
+  ],
+  "inputs": [
+    {
+      "id": "resourceFile",
+      "type": "promptString",
+      "description": "Resource file path",
+      "default": "docker/msfconsole.rc"
     }
   ]
 }

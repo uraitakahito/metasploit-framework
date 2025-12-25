@@ -3,35 +3,25 @@
   "configurations": [
     {
       "type": "rdbg",
-      "name": "Attach: msfconsole (Docker)",
-      "request": "attach",
-      "debugPort": "localhost:38697",
-      "localfsMap": "/usr/src/metasploit-framework:${workspaceFolder}"
-    },
-    {
-      "type": "rdbg",
-      "name": "Launch: msfconsole (Local)",
+      "name": "Debug: msfconsole",
       "request": "launch",
       "script": "${workspaceFolder}/msfconsole",
-      "args": [],
-      "useBundler": true,
+      "args": ["-y", "${workspaceFolder}/config/database.yml"],
       "cwd": "${workspaceFolder}"
     },
     {
       "type": "rdbg",
-      "name": "Debug: Current Ruby File",
+      "name": "Debug: Current File",
       "request": "launch",
       "script": "${file}",
-      "useBundler": true,
       "cwd": "${workspaceFolder}"
     },
     {
       "type": "rdbg",
-      "name": "Debug: RSpec Current File",
+      "name": "Debug: RSpec",
       "request": "launch",
       "command": "rspec",
       "script": "${file}",
-      "useBundler": true,
       "cwd": "${workspaceFolder}"
     }
   ]
