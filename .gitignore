@@ -94,6 +94,9 @@ data/meterpreter/ext_server_pivot.*.dll
 docker-compose.local*
 .env
 
+# Claude Code local settings
+.claude/
+
 # Ignore python bytecode
 *.pyc
 rspec.failures
