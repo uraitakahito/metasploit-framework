@@ -1,6 +1,23 @@
 #!/bin/bash
 set -e
 
+# Initialize rbenv
+if [ -d "$HOME/.rbenv" ]; then
+  export PATH="$HOME/.rbenv/bin:$PATH"
+  eval "$(rbenv init -)"
+fi
+
+# Bundle install if needed (gems not installed or Gemfile changed)
+if [ -f Gemfile ]; then
+  if ! bundle check > /dev/null 2>&1; then
+    echo "[entrypoint] Running bundle install..."
+    bundle config set force_ruby_platform 'true'
+    bundle config set without 'coverage'
+    bundle install --jobs=8
+    echo "[entrypoint] Bundle install completed"
+  fi
+fi
+
 # Generate database.yml if not exists
 # Note: Dockerfileでconfig/database.ymlをコピーしても、docker-compose.dev.ymlで
 # ソースコード全体をボリュームマウント(.:/usr/src/metasploit-framework)するため、
@@ -36,9 +53,9 @@ if [ -n "$DB_HOST" ]; then
   echo "[entrypoint] PostgreSQL is ready"
 
   # Create database if not exists (suppress error if already exists)
-  if ! bin/rails db:version > /dev/null 2>&1; then
+  if ! bundle exec rails db:version > /dev/null 2>&1; then
     echo "[entrypoint] Creating database..."
-    bin/rails db:create 2>/dev/null || true
+    bundle exec rails db:create 2>/dev/null || true
   fi
 fi
 

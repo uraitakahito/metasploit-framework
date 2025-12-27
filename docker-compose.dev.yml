@@ -28,8 +28,6 @@ services:
       - .:/usr/src/metasploit-framework
       # msf4 config directory
       - ${HOME}/.msf4:/home/developer/.msf4
-      # Bundle cache
-      - bundle_cache:/usr/local/bundle
       # Zsh history persistence
       - zsh_history:/zsh-volume
     stdin_open: true
@@ -51,5 +49,4 @@ services:
 
 volumes:
   pg_data_dev:
-  bundle_cache:
   zsh_history:
