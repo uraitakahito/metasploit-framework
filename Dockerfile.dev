@@ -9,6 +9,7 @@ ARG user_id
 ARG group_id
 ARG features_repository="https://github.com/uraitakahito/features.git"
 ARG dotfiles_repository="https://github.com/uraitakahito/dotfiles.git"
+ARG extra_utils_repository="https://github.com/uraitakahito/extra-utils.git"
 ARG ruby_version=3.3.8
 
 ENV DEBIAN_FRONTEND=noninteractive
@@ -42,6 +43,17 @@ RUN USERNAME=${user_name} \
     CONFIGUREZSHASDEFAULTSHELL=true \
     UPGRADEPACKAGES=false \
       /usr/src/features/src/common-utils/install.sh
+
+#
+# Install extra utils.
+#
+RUN cd /usr/src && \
+  git clone --depth 1 ${extra_utils_repository} && \
+  ADDEZA=true \
+  ADDGRPCURL=true \
+  ADDHADOLINT=true \
+  UPGRADEPACKAGES=false \
+    /usr/src/extra-utils/utils/install.sh
 
 #
 # metasploit group
