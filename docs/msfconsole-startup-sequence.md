@@ -1,0 +1,149 @@
+# msfconsole 起動シーケンス
+
+msfconsoleを起動してからユーザーの入力を受け付けるまでの処理フローを示すシーケンス図です。
+
+## シーケンス図
+
+```mermaid
+sequenceDiagram
+    autonumber
+    participant User as User
+    participant msfconsole as msfconsole<br/>(Entry Point)
+    participant Driver as Console<br/>Driver
+    participant Core as Core<br/>Dispatcher
+    participant EventDispatcher as EventDispatcher
+    participant ModuleManager as ModuleManager
+    participant Banner as Banner
+    participant Shell as Rex::Shell
+
+    User->>msfconsole: 起動
+
+    rect rgb(255, 255, 240)
+        Note over Driver,Shell: Phase 1: UI/Dispatcher初期化
+        Driver->>Shell: 初期化
+        Driver->>Driver: コマンドディスパッチャー登録
+    end
+
+    rect rgb(255, 240, 255)
+        Note over Driver,EventDispatcher: Phase 2: Framework初期化
+        Driver->>Driver: Msf::Framework作成
+        Driver->>EventDispatcher: EventDispatcher初期化
+        Driver->>EventDispatcher: add_ui_subscriber(subscriber)
+    end
+
+    rect rgb(240, 255, 255)
+        Note over Driver,ModuleManager: Phase 3: Module/Config ロード
+        Driver->>Driver: on_startup
+        Driver->>EventDispatcher: on_ui_start(revision)
+        Note over EventDispatcher: method_missing
+        EventDispatcher->>EventDispatcher: ui_event_subscribers.each
+        Driver->>Driver: run_single("banner")
+        Driver->>Core: cmd_banner
+        Core->>Banner: to_s
+        Banner->>Banner: ロゴファイルをランダム選択
+        Banner-->>Core: ASCII art
+        Core->>Core: framework.stats
+        Core->>Core: バナー文字列組み立て
+        Core->>Core: print_line(banner)
+        Driver->>Driver: load_resource(msfconsole.rc)
+        Driver->>Driver: 永続ハンドラー復元
+        Driver->>Driver: XCommands実行
+    end
+
+    rect rgb(248, 248, 248)
+        Note over Driver,User: Phase 4: メインループ (REPL)
+        Driver->>Shell: run
+        Shell->>Shell: with_history_manager_context
+
+        loop 入力待ちループ
+            Shell->>Shell: init_tab_complete
+            Shell->>Shell: update_prompt
+            Shell->>User: プロンプト表示
+            User->>Shell: コマンド入力
+            Shell->>Shell: get_input_line
+            Shell->>Driver: run_single(line)
+            Driver->>Driver: コマンド実行
+            Driver->>EventDispatcher: on_ui_command(command)
+            Note over EventDispatcher: method_missing
+            EventDispatcher->>EventDispatcher: ui_event_subscribers.each
+        end
+    end
+```
+
+## 各フェーズの説明
+
+### Phase 1: UI/Dispatcher初期化
+
+- シェル（入出力、プロンプト、タブ補完）を初期化
+- コマンドディスパッチャー（Core, Modules, Jobs, Db等）を登録
+
+### Phase 2: Framework初期化
+
+- `Msf::Framework`インスタンスを作成
+- EventDispatcher、ModuleManager、DataStore等のコンポーネントを初期化
+
+### Phase 3: Module/Configロード
+
+**関連ファイル**: `lib/msf/ui/console/driver.rb`
+
+- モジュールパスを初期化（`framework.init_module_paths`）
+- 別スレッドでモジュールキャッシュを更新（`ModuleCacheRebuild`）
+- コンソール設定をロード
+- `on_startup`処理:
+  - モジュールロードエラー/警告の確認
+  - ワークスペース設定
+  - バナー表示（`run_single("banner")`）
+
+**Banner表示**:
+
+`cmd_banner` (`lib/msf/ui/console/command_dispatcher/core.rb`):
+- `run_single("banner")`により`Core`ディスパッチャーの`cmd_banner`が呼び出される
+- `Banner.to_s`でASCIIアートを取得
+- `framework.stats`でモジュール統計情報を取得
+- バナー文字列を組み立て:
+  - バージョン情報（`metasploit v#{VERSION}`）
+  - 統計情報1行目: exploits, auxiliary, payloads
+  - 統計情報2行目: post, encoders, nops, evasion
+  - ドキュメントURL、Rapid7情報
+- `print_line(banner)`で出力
+
+`Banner.to_s` (`lib/msf/ui/banner.rb`):
+- ロゴファイルをランダム選択
+- ロゴディレクトリ: `data/logos/*.txt`（ユーザー定義: `~/.msf4/logos/`）
+- 環境変数による制御:
+  - `MSFLOGO`: 特定のロゴファイルを指定
+  - `GOCOW=1`: 牛テーマのロゴ
+  - `THISISHALLOWEEN=1`または10/31: ハロウィンテーマ
+  - `APRILFOOLSPONIES=1`または4/1: エイプリルフールテーマ
+
+**起動後処理**:
+- デフォルトリソーススクリプト（`~/.msf4/msfconsole.rc`）を実行
+- 永続ハンドラーを復元
+- 起動時コマンド（`-x`オプション）を実行
+
+### Phase 4: メインループ (REPL)
+
+**関連ファイル**: `lib/rex/ui/text/shell.rb`
+
+`Rex::Ui::Text::Shell#run`がRead-Eval-Print Loopを開始:
+
+1. 履歴マネージャーコンテキストを設定
+2. 無限ループ開始:
+   - タブ補完を初期化
+   - プロンプトを更新
+   - ユーザー入力を待機（`get_input_line`）
+   - コマンドを実行（`run_single`）
+3. `Ctrl+C`で中断した場合は継続
+4. `quit`/`exit`またはEOFで終了
+
+## 関連ソースファイル
+
+| ファイル | 説明 |
+|---------|------|
+| `msfconsole` | エントリーポイント |
+| `lib/msf/core/event_dispatcher.rb` | イベント配信（method_missing実装） |
+| `lib/msf/ui/console/driver.rb` | コンソールドライバー |
+| `lib/msf/ui/banner.rb` | バナー表示（ロゴ選択・読み込み） |
+| `lib/msf/ui/console/command_dispatcher/core.rb` | bannerコマンド実装 |
+| `lib/rex/ui/text/shell.rb` | シェル基底クラス |
+| `lib/rex/ui/text/dispatcher_shell.rb` | ディスパッチャーシェル |
