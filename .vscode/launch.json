@@ -5,7 +5,14 @@
       "type": "rdbg",
       "name": "Attach: msfconsole",
       "request": "attach",
+
+      //
+      // port番号はrdbgの--portとあわせる必要があります。
+      // tasks.jsonで定義されています。
+      //   https://github.com/uraitakahito/metasploit-framework/blob/40d42840b98f6d01fd138f2fd33c9728f9d1c773/.vscode/tasks.json#L19
+      //
       "debugPort": "localhost:38697",
+
       "localfs": true
     },
     {
