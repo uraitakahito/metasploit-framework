@@ -95,3 +95,4 @@ rails db:create
 ## 参考
 
 - [Setting Up a Metasploit Development Environment](https://docs.metasploit.com/docs/development/get-started/setting-up-a-metasploit-development-environment.html)
+- [msfconsole 内部動作](docs/msfconsole-internals.md)

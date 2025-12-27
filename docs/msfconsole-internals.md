@@ -1,8 +1,8 @@
-# msfconsole 起動シーケンス
+# msfconsole 内部動作
 
-msfconsoleを起動してからユーザーの入力を受け付けるまでの処理フローを示すシーケンス図です。
+msfconsoleの起動からメインループ（REPL）までの処理フローを示すシーケンス図です。
 
-## シーケンス図
+## 起動シーケンス
 
 ```mermaid
 sequenceDiagram
@@ -12,8 +12,6 @@ sequenceDiagram
     participant Driver as Console<br/>Driver
     participant Core as Core<br/>Dispatcher
     participant EventDispatcher as EventDispatcher
-    participant ModuleManager as ModuleManager
-    participant Banner as Banner
     participant Shell as Rex::Shell
 
     User->>msfconsole: 起動
@@ -50,23 +48,32 @@ sequenceDiagram
         Driver->>Driver: XCommands実行
     end
 
-    rect rgb(248, 248, 248)
-        Note over Driver,User: Phase 4: メインループ (REPL)
-        Driver->>Shell: run
-        Shell->>Shell: with_history_manager_context
+    Driver->>Shell: run（メインループへ）
+```
 
-        loop 入力待ちループ
-            Shell->>Shell: init_tab_complete
-            Shell->>Shell: update_prompt
-            Shell->>User: プロンプト表示
-            User->>Shell: コマンド入力
-            Shell->>Shell: get_input_line
-            Shell->>Driver: run_single(line)
-            Driver->>Driver: コマンド実行
-            Driver->>EventDispatcher: on_ui_command(command)
-            Note over EventDispatcher: method_missing
-            EventDispatcher->>EventDispatcher: ui_event_subscribers.each
-        end
+## メインループ (REPL)
+
+```mermaid
+sequenceDiagram
+    autonumber
+    participant User as User
+    participant Driver as Console<br/>Driver
+    participant EventDispatcher as EventDispatcher
+    participant Shell as Rex::Shell
+
+    Shell->>Shell: with_history_manager_context
+
+    loop 入力待ちループ
+        Shell->>Shell: init_tab_complete
+        Shell->>Shell: update_prompt
+        Shell->>User: プロンプト表示
+        User->>Shell: コマンド入力
+        Shell->>Shell: get_input_line
+        Shell->>Driver: run_single(line)
+        Driver->>Driver: コマンド実行
+        Driver->>EventDispatcher: on_ui_command(command)
+        Note over EventDispatcher: method_missing
+        EventDispatcher->>EventDispatcher: ui_event_subscribers.each
     end
 ```
 
@@ -75,11 +82,18 @@ sequenceDiagram
 ### Phase 1: UI/Dispatcher初期化
 
 - シェル（入出力、プロンプト、タブ補完）を初期化
-- コマンドディスパッチャー（Core, Modules, Jobs, Db等）を登録
+- コマンドディスパッチャーを登録（`lib/msf/ui/console/driver.rb`）:
+  1. **Core** - 基本コマンド（`use`, `set`, `show`, `info`, `banner`等）
+  2. **Modules** - モジュール管理（`search`, `reload`, `loadpath`等）
+  3. **Jobs** - ジョブ管理（`jobs`, `kill`等）
+  4. **Resource** - リソーススクリプト（`resource`, `makerc`等）
+  5. **Db** - データベース操作（`db_status`, `hosts`, `services`, `vulns`等）
+  6. **Creds** - 認証情報管理（`creds`等）
+  7. **Developer** - 開発者向け（`edit`, `reload_lib`, `log`等）
+  8. **DNS** - DNS設定（`dns`等）
 
 ### Phase 2: Framework初期化
 
-- `Msf::Framework`インスタンスを作成
 - EventDispatcher、ModuleManager、DataStore等のコンポーネントを初期化
 
 ### Phase 3: Module/Configロード
@@ -135,15 +149,3 @@ sequenceDiagram
    - コマンドを実行（`run_single`）
 3. `Ctrl+C`で中断した場合は継続
 4. `quit`/`exit`またはEOFで終了
-
-## 関連ソースファイル
-
-| ファイル | 説明 |
-|---------|------|
-| `msfconsole` | エントリーポイント |
-| `lib/msf/core/event_dispatcher.rb` | イベント配信（method_missing実装） |
-| `lib/msf/ui/console/driver.rb` | コンソールドライバー |
-| `lib/msf/ui/banner.rb` | バナー表示（ロゴ選択・読み込み） |
-| `lib/msf/ui/console/command_dispatcher/core.rb` | bannerコマンド実装 |
-| `lib/rex/ui/text/shell.rb` | シェル基底クラス |
-| `lib/rex/ui/text/dispatcher_shell.rb` | ディスパッチャーシェル |
