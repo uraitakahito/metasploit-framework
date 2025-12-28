@@ -7,14 +7,17 @@ msfconsoleの起動からメインループ（REPL）までの処理フローを
 ```mermaid
 sequenceDiagram
     autonumber
-    participant User as User
     participant msfconsole as msfconsole<br/>(Entry Point)
-    participant Driver as Console<br/>Driver
+    participant Console as Metasploit::Framework<br/>::Command::Console
+    participant Driver as Msf::Ui::Console<br/>::Driver
+    participant SimpleFramework as Msf::Simple<br/>::Framework
+    participant Framework as Msf::Framework
+    participant FES as FrameworkEvent<br/>Subscriber
     participant Core as Core<br/>Dispatcher
     participant EventDispatcher as EventDispatcher
-    participant Shell as Rex::Shell
 
-    User->>msfconsole: 起動
+    msfconsole->>Console: Console.start
+    Console->>Driver: Driver.new
 
     rect rgb(255, 255, 240)
         Note over Driver,Shell: Phase 1: UI/Dispatcher初期化
@@ -24,9 +27,17 @@ sequenceDiagram
 
     rect rgb(255, 240, 255)
         Note over Driver,EventDispatcher: Phase 2: Framework初期化
-        Driver->>Driver: Msf::Framework作成
-        Driver->>EventDispatcher: EventDispatcher初期化
-        Driver->>EventDispatcher: add_ui_subscriber(subscriber)
+        Driver->>SimpleFramework: create
+        SimpleFramework->>Framework: Framework.new
+        Framework->>EventDispatcher: EventDispatcher.new
+        Framework->>FES: FrameworkEventSubscriber.new
+
+        rect rgb(255, 220, 220)
+            Note over Framework,EventDispatcher: Phase 2-1: Subscriber登録
+            Framework->>EventDispatcher: add_*_subscriber ×4<br/>(exploit/session/general/db)
+            Framework->>EventDispatcher: add_ui_subscriber(subscriber)
+            Note over EventDispatcher: method_missing
+        end
     end
 
     rect rgb(240, 255, 255)
@@ -40,12 +51,7 @@ sequenceDiagram
         Core->>Banner: to_s
         Banner->>Banner: ロゴファイルをランダム選択
         Banner-->>Core: ASCII art
-        Core->>Core: framework.stats
-        Core->>Core: バナー文字列組み立て
         Core->>Core: print_line(banner)
-        Driver->>Driver: load_resource(msfconsole.rc)
-        Driver->>Driver: 永続ハンドラー復元
-        Driver->>Driver: XCommands実行
     end
 
     Driver->>Shell: run（メインループへ）
@@ -57,7 +63,7 @@ sequenceDiagram
 sequenceDiagram
     autonumber
     participant User as User
-    participant Driver as Console<br/>Driver
+    participant Driver as Msf::Ui::Console<br/>::Driver
     participant EventDispatcher as EventDispatcher
     participant Shell as Rex::Shell
 
@@ -87,7 +93,7 @@ sequenceDiagram
   2. [**Modules**](../lib/msf/ui/console/command_dispatcher/modules.rb) - モジュール管理（`search`, `reload`, `loadpath`等）
   3. [**Jobs**](../lib/msf/ui/console/command_dispatcher/jobs.rb) - ジョブ管理（`jobs`, `kill`等）
   4. [**Resource**](../lib/msf/ui/console/command_dispatcher/resource.rb) - リソーススクリプト（`resource`, `makerc`等）
-  5. [**Db**](../lib/msf/ui/console/command_dispatcher/db.rb) - データベース操作（`db_status`, `hosts`, `services`, `vulns`等）
+  5. [**Db**](../lib/msf/ui/console/command_dispatcher/db.rb) - データベース操作（`workspace`, `db_status`, `hosts`, `services`, `vulns`等）
   6. [**Creds**](../lib/msf/ui/console/command_dispatcher/creds.rb) - 認証情報管理（`creds`等）
   7. [**Developer**](../lib/msf/ui/console/command_dispatcher/developer.rb) - 開発者向け（`edit`, `reload_lib`, `log`等）
   8. [**DNS**](../lib/msf/ui/console/command_dispatcher/dns.rb) - DNS設定（`dns`等）
@@ -111,22 +117,7 @@ sequenceDiagram
 [`cmd_banner`](../lib/msf/ui/console/command_dispatcher/core.rb#L272):
 - `run_single("banner")`により`Core`ディスパッチャーの`cmd_banner`が呼び出される
 - [`Banner.to_s`](../lib/msf/ui/banner.rb#L39)でASCIIアートを取得
-- `framework.stats`でモジュール統計情報を取得
-- バナー文字列を組み立て:
-  - バージョン情報（`metasploit v#{VERSION}`）
-  - 統計情報1行目: exploits, auxiliary, payloads
-  - 統計情報2行目: post, encoders, nops, evasion
-  - ドキュメントURL、Rapid7情報
 - `print_line(banner)`で出力
-
-[`Banner.to_s`](../lib/msf/ui/banner.rb#L39):
-- ロゴファイルをランダム選択
-- ロゴディレクトリ: `data/logos/*.txt`（ユーザー定義: `~/.msf4/logos/`）
-- 環境変数による制御:
-  - `MSFLOGO`: 特定のロゴファイルを指定
-  - `GOCOW=1`: 牛テーマのロゴ
-  - `THISISHALLOWEEN=1`または10/31: ハロウィンテーマ
-  - `APRILFOOLSPONIES=1`または4/1: エイプリルフールテーマ
 
 **起動後処理**:
 - デフォルトリソーススクリプト（`~/.msf4/msfconsole.rc`）を実行
@@ -145,3 +136,41 @@ sequenceDiagram
    - コマンドを実行（`run_single`）
 3. `Ctrl+C`で中断した場合は継続
 4. `quit`/`exit`またはEOFで終了
+
+## イベント記録
+
+msfconsoleの操作はデータベースの`events`テーブルに記録される。
+
+### 記録されるイベント
+
+| イベント名 | 発生タイミング |
+|-----------|---------------|
+| `ui_start` | msfconsole起動時 |
+| `ui_stop` | msfconsole終了時 |
+| `ui_command` | コマンド実行時 |
+| `module_run` | モジュール実行開始 |
+| `module_complete` | モジュール実行完了 |
+| `module_error` | モジュールエラー |
+| `session_open` | セッション確立時 |
+
+### 処理の流れ
+
+```mermaid
+sequenceDiagram
+    participant ED as EventDispatcher
+    participant FES as FrameworkEvent<br/>Subscriber
+    participant DB as DbManager
+    participant Mdm as Mdm::Event
+    participant PG as PostgreSQL
+
+    ED->>FES: on_ui_command(command)
+    FES->>FES: report_event(...)
+    FES->>DB: report_event(data)
+    DB->>Mdm: create(...)
+    Mdm->>PG: INSERT INTO events
+```
+
+### 関連ソース
+
+- [FrameworkEventSubscriber](../lib/msf/core/framework.rb#L320) - イベント購読・記録
+- [report_event](../lib/msf/core/db_manager/event.rb#L52) - DB書き込み
