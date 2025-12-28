@@ -1,6 +1,10 @@
 {
   "version": "0.2.0",
   "configurations": [
+    //
+    // このデバッグ手法を試す際は事前に `tasks.json` の `msfconsole (debug)` のタスクを起動する必要があります。
+    // 詳細の手順は `DEBUG.md` を参照してください。
+    //
     {
       "type": "rdbg",
       "name": "Attach: msfconsole",
@@ -15,6 +19,7 @@
 
       "localfs": true
     },
+
     {
       "type": "rdbg",
       "name": "Debug: Current File",
