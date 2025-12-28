@@ -1,3 +1,5 @@
+inherit_from: .rubocop_todo.yml
+
 # This list was intially created by analyzing the last three months (51
 # modules) committed to Metasploit Framework. Many, many older modules
 # will have offenses, but this should at least provide a baseline for
@@ -5,8 +7,6 @@
 #
 # Updates to this file should include a 'Description' parameter for any
 # explanation needed.
-
-# inherit_from: .rubocop_todo.yml
 
 AllCops:
   TargetRubyVersion: 2.7
@@ -263,6 +263,109 @@ Style/RedundantReturn:
   Description: 'This often looks weird when mixed with actual returns, and hurts nothing'
   Enabled: false
 
+# Disabled to avoid modifying upstream code
+Style/HashSyntax:
+  Enabled: false
+
+Style/AccessorGrouping:
+  Enabled: false
+
+Style/StringLiterals:
+  Enabled: false
+
+Style/BlockDelimiters:
+  Enabled: false
+
+Style/RedundantSelf:
+  Enabled: false
+
+Style/AndOr:
+  Enabled: false
+
+Style/Not:
+  Enabled: false
+
+Style/ZeroLengthPredicate:
+  Enabled: false
+
+Style/DefWithParentheses:
+  Enabled: false
+
+Style/MissingRespondToMissing:
+  Enabled: false
+
+Style/StringLiteralsInInterpolation:
+  Enabled: false
+
+Style/WhileUntilModifier:
+  Enabled: false
+
+Lint/RescueException:
+  Enabled: false
+
+Lint/UselessAssignment:
+  Enabled: false
+
+Lint/NonLocalExitFromIterator:
+  Enabled: false
+
+Lint/SuppressedException:
+  Enabled: false
+
+Lint/UnusedBlockArgument:
+  Enabled: false
+
+Style/HashEachMethods:
+  Enabled: false
+
+Style/Alias:
+  Enabled: false
+
+Style/SoleNestedConditional:
+  Enabled: false
+
+Style/SpecialGlobalVars:
+  Enabled: false
+
+Style/ClassCheck:
+  Enabled: false
+
+Style/GlobalVars:
+  Enabled: false
+
+Style/RescueStandardError:
+  Enabled: false
+
+Style/ExplicitBlockArgument:
+  Enabled: false
+
+Style/MethodCallWithoutArgsParentheses:
+  Enabled: false
+
+Style/MultilineIfModifier:
+  Enabled: false
+
+Style/Next:
+  Enabled: false
+
+Style/ParallelAssignment:
+  Enabled: false
+
+Style/PreferredHashMethods:
+  Enabled: false
+
+Style/Proc:
+  Enabled: false
+
+Style/SlicingWithRange:
+  Enabled: false
+
+Style/StderrPuts:
+  Enabled: false
+
+Naming/VariableName:
+  Enabled: false
+
 Naming/HeredocDelimiterNaming:
   Description: >-
     Could be enabled in isolation with additional effort.
@@ -314,6 +417,7 @@ Style/Documentation:
     - 'modules/**/*'
     - 'test/modules/**/*'
     - 'spec/file_fixtures/modules/**/*'
+    - 'lib/**/*'
 
 Layout/FirstArgumentIndentation:
   Enabled: true
@@ -404,7 +508,7 @@ Naming/MethodParameterName:
   Description: 'Whoever made this requirement never looked at crypto methods, IV'
   MinNameLength: 2
 
-Naming/PredicateName:
+Naming/PredicatePrefix:
   Enabled: true
   # Current methods that break the rule, so that we don't add additional methods that break the convention
   AllowedMethods:
@@ -657,7 +761,7 @@ Style/PercentLiteralDelimiters:
   VersionChanged: '0.48.1'
 
 Style/RedundantBegin:
-  Enabled: true
+  Enabled: false
 
 Style/SafeNavigation:
   Description: >-
@@ -676,7 +780,8 @@ Style/UnpackFirst:
   Enabled: false
 
 Lint/DetectMetadataTrailingLeadingWhitespace:
-  Enabled: true
+  Description: 'Disabled due to errors in custom cop implementation'
+  Enabled: false
 
 Lint/DetectOutdatedCmdExecApi:
   Description: >-
