@@ -6,9 +6,9 @@ VS Code + Docker で Metasploit Framework を開発・デバッグする手順�
 
 - Docker Desktop
 - VS Code + 拡張機能:
-  - `ms-vscode-remote.remote-containers` - Dev Containers
-  - `KoichiSasada.vscode-rdbg` - Ruby デバッガー
-  - `castwide.solargraph` - Ruby Language Server
+  - [Dev Containers](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers)
+  - [Ruby デバッガー](https://marketplace.visualstudio.com/items?itemName=rebornix.Ruby)
+  - [Ruby Language Server](https://marketplace.visualstudio.com/items?itemName=castwide.solargraph)
 
 ## セットアップ
 
